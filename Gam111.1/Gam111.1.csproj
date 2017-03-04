@@ -75,8 +75,44 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DynamicShadowProjector\Samples\Scripts\Rotate.cs" />
+    <Compile Include="Assets\DynamicShadowProjector\Samples\Scripts\Swing.cs" />
+    <Compile Include="Assets\DynamicShadowProjector\Scripts\DrawSceneObject.cs" />
+    <Compile Include="Assets\DynamicShadowProjector\Scripts\DrawTargetObject.cs" />
+    <Compile Include="Assets\DynamicShadowProjector\Scripts\FollowTargetObject.cs" />
+    <Compile Include="Assets\DynamicShadowProjector\Scripts\MipmappedShadowFallback.cs" />
+    <Compile Include="Assets\DynamicShadowProjector\Scripts\ShadowTextureRenderer.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\ShadowControl.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\DynamicShadowProjector\Readme.txt" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\Blit.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\Blur.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\CopyMipmap.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\Downsample.cginc" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\Downsample.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\DownsampleFallback.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Blit\EraseShadow.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Caps\glslCheck.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Caps\tex2DlodExtensionCheck.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\DSPProjector.cginc" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\Dynamic\LightxShadowWithLinearFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\Dynamic\LightxShadowWithoutFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\Dynamic\MipmappedShadow.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\Dynamic\ShadowWithLinearFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\Dynamic\ShadowWithoutFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\LightWithLinearFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\LightWithoutFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\LightxShadowWithLinearFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\LightxShadowWithoutFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\MipmappedShadow.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\ShadowWithLinearFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Projector\ShadowWithoutFalloff.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Shadow\DSPShadow.cginc" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Shadow\ShadowForReplacement.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Shadow\ShadowOpaque.shader" />
+    <None Include="Assets\DynamicShadowProjector\Shaders\Shadow\ShadowTransparent.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

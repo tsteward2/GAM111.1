@@ -11,13 +11,11 @@ public class PlayerController : MonoBehaviour {
     float V;
     public float ForwardTorqueFactor;
     public float SideTorqueFactor;
-
+    public float jumpForce = 30;
     //Player Shadow Variables
-    public GameObject playerShadow;
-    ShadowControl ShadowController;
-    Vector3 HitLocation;
-    bool isShadow = false;
-    GameObject shadow;
+ 
+    
+
 
     private void Awake()
     {
@@ -30,9 +28,19 @@ public class PlayerController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        ShadowController = playerShadow.GetComponent<ShadowControl>();
+
     }
 
+    private void Update()
+    {
+      
+        if (Input.GetButtonDown("Jump") == true)
+        {
+            var newforce = (jumpForce * (playerRB.mass * (-Physics.gravity.y * -Physics.gravity.y)));
+            playerRB.AddForce(transform.up * newforce );
+        }
+    
+    }
 
 
     // Update is called once per frame
@@ -40,27 +48,9 @@ public class PlayerController : MonoBehaviour {
     {
         Movement();
         TorqueFactor();
-        
-        //place shadow
-        RaycastHit Hit;
 
-        if (Physics.Raycast((transform.localPosition - new Vector3(0f,0.5f,0f)), -transform.up, out Hit, 20.0f))
-        {
-            if (isShadow == false)
-            {
-             shadow = Instantiate(playerShadow, HitLocation, Quaternion.Euler(90,0,0));
-                isShadow = true;
-            }
-            else
-            {   // instanstiate 
-                HitLocation = Hit.transform.position;
 
-                var DisFromground = (HitLocation - transform.position).magnitude;
-                shadow.transform.position = HitLocation;
-                Debug.Log(DisFromground);
-
-            }
-        }
+            
     }
 
   
