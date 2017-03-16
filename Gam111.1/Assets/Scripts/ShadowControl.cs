@@ -5,31 +5,43 @@ using UnityEngine;
 public class ShadowControl : MonoBehaviour {
 
     Rigidbody Player;
+    Collider PlayerCol;
     Vector3 PlayerPosition;
     Projector ShadowProjector;
-    Terrain World;
-    //float height = 5.0f;
+    GameObject PlayerSpawn;
+    float height = 10.0f;
     float ShadowFactor;
-    float HeightDifference = 10;
+   
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 
         Player = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Rigidbody>();
-        World = GameObject.Find("Terrain").GetComponent<Terrain>();
-        ShadowProjector = GameObject.Find("ProjectorScene").GetComponent<Projector>();
-		var PlayerPos = Player.transform.position;
-        var newPos = new Vector3(PlayerPos.x, PlayerPos.y + HeightDifference, PlayerPos.z);
-        transform.position = newPos;
+        PlayerCol = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Collider>();
+
+        ShadowProjector = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Projector>();
+
+        PlayerSpawn = GameObject.FindGameObjectWithTag("PlayerSpawn");
+
+      transform.position = PlayerSpawn.transform.position;
+
+       
+	
+  
 	}
 
     // Update is called once per frame
     void Update()
-    {
-
-
+    { 
+        PlayerPosition = Player.transform.position;
+        var NewPos = PlayerPosition + new Vector3(0, height, 0);
+        gameObject.transform.position = NewPos;
         
 
         
+
+
+
+
     }
 
     public void ShadowChangeHeight(float Height)
@@ -45,6 +57,8 @@ public class ShadowControl : MonoBehaviour {
             ShadowProjector.orthographicSize = 1.0f;
         }
     }
+
+
 
 
    

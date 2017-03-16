@@ -8,43 +8,65 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     Rigidbody PlayerRB;
     PlayerController playerScript;
-    
+
 
     float MinMag;
     float MaxMag = 4.0f;
     Vector3 playerPos;
-    Vector3 TargetPosLook;
+    public GameObject TargetLook;
     float PlayerMagnitude;
-    float CameraSpeed = 2f;
+    float CameraSpeed = 0.5f;
+
 
     public Vector3 TargetPos;
-    float Yoffset = 0.75f;
+    float Yoffset = 1.5f;
     float Zoffset = 2.0f;
 
-    void Start()
+    void Awake()
     {
-        
+
         PlayerRB = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Rigidbody>();
-        playerScript = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        playerScript = GameObject.FindGameObjectWithTag("Player").GetComponentInParent<PlayerController>();
 
 
+    }
+    private void Update()
+    {
+     if(PlayerRB.velocity.z < 0)
+        {
+            Yoffset = 2.0f;
+            Zoffset = 4.0f;
+        }
+     else
+        {
+            Yoffset = 0.75f;
+            Zoffset = 2.0f;
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        
-        Debug.Log(playerScript.BoostIs);
+
+      
         playerPos = PlayerRB.transform.position;
         PlayerMagnitude = (playerPos - transform.position).magnitude;
-        TargetPos = new Vector3(playerPos.x, playerPos.y + Yoffset, playerPos.z - Zoffset);
+
         MinMag = (playerPos - TargetPos).magnitude;
-        transform.LookAt(playerPos);
+
+        Vector3 LookPos = TargetLook.transform.position;
+        transform.LookAt(LookPos);
+
+        //Keep Camera Bheind Player
+
+        var BehindPlayer = (-PlayerRB.velocity).normalized;
+       TargetPos = new Vector3(playerPos.x, playerPos.y + Yoffset, playerPos.z - Zoffset);
 
 
-        if(playerScript.BoostIs == true)
+
+        if (playerScript.BoostIs == true)
         {
-        transform.position = TargetPos;
+            transform.position = TargetPos;
         }
         else
         {
@@ -58,9 +80,14 @@ public class CameraController : MonoBehaviour
                 transform.position = Vector3.SmoothDamp(transform.position, TargetPos, ref Velocity, CameraSpeed * Time.fixedDeltaTime);
 
                 //  Debug.Log(PlayerMagnitude);
-                
+
             }
         }
-   
+
     }
+
+   
+
 }
+
+  

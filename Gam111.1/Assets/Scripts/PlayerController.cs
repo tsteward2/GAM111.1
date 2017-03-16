@@ -5,10 +5,30 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
 
+
+    //Health PickUp
+
+
     Rigidbody playerRB;
+    TrailDustController Dust;
     Collider PlayerCollider;
     ShadowControl Shadow;
     CameraController CamScript;
+    GameObject playertoy;
+
+    //Player Variables
+    public float Life;
+    public float MaxLife = 200;
+    public float startLifes = 100;
+
+    //Jump Variables
+   public int jumpCount;
+    int Jump = 1;
+    int DoubleJump = 2;
+    int jumpMax = 1;
+   public  bool inAir = false;
+    public bool doubleJumpEnabled = false;
+
 
     //Movement Variables
     float H;
@@ -28,21 +48,27 @@ public class PlayerController : MonoBehaviour {
     float MinFov = 55.0f;
     float CurrentFov;
    public bool BoostIs = false;
-    float BoostCoolDown;
-    float BoostCoolTime = 0;
-   
+    public float BoostCoolDown = 5f;
+    public float BoostCoolTime = 0f;
+    public float BoostPercentage;
+
     //Player Shadow Variables
- 
-    
+    float newHeight;
+
+    //playersize
+
+    public int TotemsCollected = 0;
+
 
 
     private void Awake()
     {
-       playerRB = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Rigidbody>();
+        Dust = gameObject.GetComponentInChildren<TrailDustController>();
+        playerRB = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Rigidbody>();
         PlayerCollider = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Collider>();
         CamScript = Camera.main.GetComponent<CameraController>();
-
-        Shadow = GameObject.FindObjectOfType<ShadowControl>();
+        playertoy = GameObject.Find("PlayerToy");
+        Shadow = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<ShadowControl>();
         BoostCoolDown = BoostDuration + 5.0f;
     }
 
@@ -52,27 +78,52 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+        Life = startLifes;
+        playerRB.maxAngularVelocity = 12.0f;
+
     }
+
+
+
 
     private void Update()
     {
+        BoostTimerUpdate(BoostCoolTime);
+        Dust.PlayParticleDust(inAir);
+        
+        var PlayerScale = playertoy.transform.localScale.x;
+        var newscale = PlayerScale + (TotemsCollected / 4);
 
+        playertoy.transform.localScale = new Vector3(newscale, newscale, newscale);
+        
+
+
+
+        Life = Mathf.Clamp(Life, 0, MaxLife);
+        DoubleJumpControl();
+     
+
+       
+        if(playerRB.transform.position.y <= 10.0f)
+        {
+            Life = 0;
+        }
+
+       if(inAir == false)
+        {
+            JumpReset();
+        }
+
+
+        //FOVPUSH
         CurrentFov = Camera.main.fieldOfView;
         BoostTime -= Time.deltaTime;
         BoostCoolTime -= Time.deltaTime;
 
-       // Debug.Log("Velociyy " + playerRB.velocity);
+       // Debug.Log("Velociyy " + playerRB.velocity.magnitude);
        // Debug.Log("Torque" + playerRB.angularVelocity);
 
-        //Check Height from ground
-        RaycastHit Hit;
-
-        if(Physics.Raycast(playerRB.transform.position, -transform.up, out Hit, 20.0f))
-        {
-            var newHeight = (Hit.distance - PlayerCollider.bounds.extents.y) + 1;
-            Shadow.ShadowChangeHeight(newHeight);
-
-        }
+       
         // Fov Push on boost
         if (Input.GetButtonDown("Boost"))
         {
@@ -88,24 +139,47 @@ public class PlayerController : MonoBehaviour {
     }
 
 
+
     // Update is called once per frame
     void FixedUpdate()
     {
         Movement();
         TorqueFactor();
         ControlSpeed(playerRB.velocity);
-       // Debug.Log("VelocityZ:  " + playerRB.velocity.z);
+        // Debug.Log("VelocityZ:  " + playerRB.velocity.z);
 
 
-     if (Input.GetButtonDown("Jump") == true)
+        if (Input.GetButtonDown("Jump") == true)
         {
-            var newforce = (jumpForce * (playerRB.mass * (-Physics.gravity.y * -Physics.gravity.y)));
-            playerRB.AddForce(transform.up * newforce );
+
+            if (jumpCount < jumpMax)
+            {
+
+
+                inAir = true;
+                var newforce = (jumpForce * (playerRB.mass * (-Physics.gravity.y * -Physics.gravity.y)));
+                playerRB.AddForce(transform.up * newforce);
+                ++jumpCount;
+            }
         }
+    }  
 
 
-            
+    void BoostTimerUpdate(float BoostTimeCoolDown)
+    {
+        if (BoostTimeCoolDown >= 0.0f)
+        {
+            BoostPercentage = 1 - (BoostCoolTime / BoostCoolDown);
+        }
+        if(BoostTimeCoolDown < 0.0f)
+        {
+            BoostPercentage = 1;
+        }
     }
+    
+
+
+
     void ControlSpeed(Vector3 Velocity)
     {
         var Z = Velocity.z;
@@ -117,23 +191,54 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-  
+
 
     public void Movement()
     {
-//Get input
-
-       
-        H = Input.GetAxisRaw("Horizontal");
-        V = Input.GetAxisRaw("Vertical");
+        //Get input
+ H = Input.GetAxisRaw("Horizontal");
+      V = Input.GetAxisRaw("Vertical");
         // apply Input
-        var VDir = Camera.main.transform.right;
-        var HDir = Camera.main.transform.forward;
+       var VDir = Camera.main.transform.right;
+       var HDir = Camera.main.transform.forward;
+        switch (inAir)
+        {
+            case false:
+                {
+                    
 
-        playerRB.AddTorque(VDir * ForwardTorqueFactor * V);
-        playerRB.AddTorque(HDir * -SideTorqueFactor * H);
+                      playerRB.AddTorque(VDir * ForwardTorqueFactor * V);
+                      playerRB.AddTorque(HDir * -SideTorqueFactor * H);
+                    break;
+                }
+            case true:
+                {
 
+                    playerRB.AddForce(H * transform.right * 5);
+                    playerRB.AddForce(V * transform.forward * 8);
+                    break;
+
+                }
     }
+    }
+
+    void DoubleJumpControl()
+    {
+        switch (doubleJumpEnabled)
+        {
+            case true:
+                
+                    jumpMax = DoubleJump;
+                break;
+                        
+            case false:
+                    jumpMax = Jump;
+                    break;
+                
+        }
+    }
+
+    //weight torque factoring
 
     public void TorqueFactor()
     {
@@ -169,11 +274,28 @@ public class PlayerController : MonoBehaviour {
         if (BoostTime >= 0.0f)
         {
          Camera.main.fieldOfView = MinFov;
-
+         BoostIs = false;
         yield return true;
-        BoostIs = false;
+       
         }
        
         
+    }
+
+   
+
+    public void AddHealth()
+    {
+        Life += 25.0f;
+    }
+
+    public void takeDamage(float Damage)
+    {
+        Life -= Damage;
+    }
+
+    public void JumpReset()
+    {
+        jumpCount = 0;
     }
 }
